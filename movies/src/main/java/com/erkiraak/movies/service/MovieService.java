@@ -1,11 +1,11 @@
 package com.erkiraak.movies.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import com.erkiraak.movies.repository.MovieRepository;
-
-
 import com.erkiraak.movies.entity.Movie;
+import com.erkiraak.movies.repository.MovieRepository;
 
 @Service
 public class MovieService {
@@ -19,7 +19,7 @@ public class MovieService {
         repository.save(movie);
     }
 
-    public Iterable<Movie> findAll() {
+    public List<Movie> findAll() {
         return repository.findAll();
     }
 

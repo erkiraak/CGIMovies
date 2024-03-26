@@ -2,7 +2,6 @@ package com.erkiraak.movies.util;
 
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.erkiraak.movies.entity.Room;

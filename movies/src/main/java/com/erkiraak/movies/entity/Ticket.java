@@ -1,5 +1,7 @@
 package com.erkiraak.movies.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,12 +28,16 @@ public class Ticket {
     private int rowNumber;
     private int seatNumber;
 
+    LocalDateTime createdAt;
+
     
     public Ticket(Session session, int rowNumber, int seatNumber) {
         this.session = session;
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
         session.addTicket(this);
+        this.createdAt = LocalDateTime.now();
+
     }
     
     public Ticket(Session session, User user, int rowNumber, int seatNumber) {
@@ -40,6 +46,7 @@ public class Ticket {
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
         session.addTicket(this);
+        this.createdAt = LocalDateTime.now();
     }
     public Session getSession() {
         return session;

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to CGIMovies</title>
+    <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body>
+<div class="container">
+    <div sec:authorize="isAuthenticated()">
+  This content is only shown to authenticated users.
+</div>
+<div sec:authorize="!isAuthenticated()">
+  This content is only shown to unauthenticated users.
+</div>
+
+    <div>
+        <h1>List of Movies</h1>
+    </div>
+     
+    <div>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Overview</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="movie: ${listMovies}">
+                    <td th:text="${movie.title}">User ID</td>
+                    <td th:text="${movie.overview}">Overview</td>
+                    <td th:text="${movie.averageRating}">Rating</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 public class Movie {
 
     @Id
-    private int id;
+    private int movieId;
     private String title;
     private String titleOriginal;
     private String language;
@@ -26,7 +26,7 @@ public class Movie {
 
     public Movie(int id, String title, String titleOriginal, String language, String overview, double averageRating,
             int voteCount, String releaseDate, String posterPath) {
-        this.id = id;
+        this.movieId = id;
         this.title = title;
         this.titleOriginal = titleOriginal;
         this.language = language;
@@ -45,11 +45,11 @@ public class Movie {
     }
 
     public int getId() {
-        return id;
+        return movieId;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.movieId = id;
     }
 
     public String getTitle() {
