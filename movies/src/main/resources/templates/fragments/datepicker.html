@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Datepicker fragment</title>
+</head>
+
+<body>
+
+    <div class="container" th:fragment="datepicker">
+        <div class="row rounded">
+            <div class="col">
+                <div class="btn-group" role="group" aria-label="Next 7 Days">
+                    <a disabled type="button" class="btn btn-dark btn-arrow" id="prevBtn"
+                        onclick="previousWeek()">&lt;</a>
+
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons" id="dateButtons"></div>
+
+                    <a type="button" class="btn btn-dark btn-arrow" id="nextBtn" onclick="nextWeek()">&gt;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

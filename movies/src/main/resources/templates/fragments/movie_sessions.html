@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Movie sessions fragment</title>
+
+</head>
+
+<body>
+    <div class="container" th:fragment="movie-sessions" id="fragmentContainer">
+        <div th:fragment="movie-sessions-table">
+
+
+            <div class="my-2 card overflow-hidden" th:each="sessionObject: ${sessionList}">
+                <div class="card-body p-0">
+                    <div class="row">
+                        
+                        <div class="col-sm">
+                           
+                            <div class="row py-3">
+                                <div class="col-sm">
+                                    <h6>Screen <span th:text="${sessionObject.room.id}">Screen</span></h6>
+                                    <h3 th:text="${#temporals.format(sessionObject.time, 'HH:mm')}">Time</h3>
+                                </div>
+
+
+                                <div class="col-sm">
+                                    <div class="row">
+                                        <h6 class="truncate-text w200" th:if="${sessionObject.movie.genres != null}"
+                                            th:text="${sessionObject.movie.getGenresAsString()}">Genres</h6>
+                                    </div>
+
+                                    <div class="flex-row">
+                                        <span>Rating: </span>
+                                        <h3 class="px-1" th:text="${sessionObject.movie.averageRating}">Rating</h3>
+                                        <h6>(<span th:text="${sessionObject.movie.voteCount}">VoteCount</span>)</h6>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm">
+                                    <div class="row">
+                                        
+                                        <div class="btn btn-primary buy-tickets-btn" th:data-session-id="${sessionObject.getIntId()}" data-bs-toggle="modal"
+                                            data-bs-target="#ticket-modal">Buy tickets</div>
+                                    </div>
+                                    <div class="row">
+                                        <span>Seats available: </span>
+
+                                        <h6>
+                                            <span th:text="${sessionObject.getNumberOfAvailableSeats()}">Available
+                                                Seats</span>/<span th:text="${sessionObject.getNumberOfSeats()}">Number
+                                                of Seats</span>
+
+                                        </h6>
+                                    </div>
+                                </div>
+
+                            </div>
+                           
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

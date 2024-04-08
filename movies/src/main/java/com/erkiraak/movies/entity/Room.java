@@ -1,5 +1,8 @@
 package com.erkiraak.movies.entity;
 
+import com.erkiraak.movies.util.JsonUtils;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,7 +12,7 @@ import jakarta.persistence.Transient;
 public class Room {
 
     @Id
-    private int roomId;
+    private int id;
     @Column(name = "number_of_rows")
     private int rows;
     private int seatsPerRow;
@@ -20,51 +23,30 @@ public class Room {
     private String seatWeightsJson;
 
     @Transient
-    private int[][] seatWeights;
-    
-        
+    @Nullable
+    private int[][] seatWeightsArray;
 
-    public Room() {
-    }
+    public void calculateSeatWeights() {
+        // Assign weights based on the distance from the best seat and row
+        int[][] seatWeights = new int[this.rows][this.seatsPerRow];
 
-    public Room(int id, int rows, int seatsPerRow, int bestSeatRow, int bestSeatColumn) {
-        this.roomId = id;
-        this.rows = rows;
-        this.seatsPerRow = seatsPerRow;
-        this.bestSeatRow = bestSeatRow;
-        this.bestSeatColumn = bestSeatColumn;
-        this.seatWeights = calculateSeatWeights(rows, seatsPerRow, bestSeatRow, bestSeatColumn);
-    }
-
-    private int[][] calculateSeatWeights(int rows, int seatsPerRow, int bestSeatRow, int bestSeatColumn) {
-        int[][] seatWeights = new int[rows][seatsPerRow];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < seatsPerRow; j++) {
-                // Assign weights based on the distance from the best seat and row
-                int rowDistance = Math.abs(bestSeatRow - i);
-                int columnDistance = Math.abs(bestSeatColumn - j);
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.seatsPerRow; j++) {
+                int rowDistance = Math.abs(this.bestSeatRow - i);
+                int columnDistance = Math.abs(this.bestSeatColumn - j);
                 seatWeights[i][j] = rowDistance + columnDistance;
             }
         }
-
-        return seatWeights;
+        this.seatWeightsArray = seatWeights;
+        setSeatWeightsJson();
     }
 
-    public int getRoomId() {
-        return roomId;
+    public int getId() {
+        return id;
     }
 
-    public String getSeatWeightsJson() {
-        return seatWeightsJson;
-    }
-
-    public void setSeatWeightsJson(String seatWeightsJson) {
-        this.seatWeightsJson = seatWeightsJson;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getRows() {
@@ -99,13 +81,26 @@ public class Room {
         this.bestSeatColumn = bestSeatColumn;
     }
 
-    public int[][] getSeatWeights() {
-        return seatWeights;
+    public String getSeatWeightsJson() {
+        return seatWeightsJson;
     }
 
-    public void setSeatWeights(int[][] seatWeights) {
-        this.seatWeights = seatWeights;
+    // save JSON after creating or updating array
+    private void setSeatWeightsJson() {
+        this.seatWeightsJson = JsonUtils.convertToJson(seatWeightsArray);
+        
     }
 
+    public int[][] getSeatWeightsArray() {
+        if (seatWeightsArray == null) {
+            setSeatWeightsArray();
+        }
+        return seatWeightsArray;
+    }
+
+    // generate array from JSON after deserialization
+    private void setSeatWeightsArray() {
+            this.seatWeightsArray = JsonUtils.convertFromJson(seatWeightsJson, int[][].class);
+    }
 
 }

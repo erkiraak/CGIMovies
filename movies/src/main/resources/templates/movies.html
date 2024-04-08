@@ -2,45 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome to CGIMovies</title>
-    <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Movies</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <style th:inline="text">
+        .img-container {
+            background: url([[${movie.backDropURL}]]) no-repeat center center;
+            height: 40%;
+            width: 100%;
+            position: absolute;
+            top: 56px;
+            left: 50%;
+            transform: translate(-50%, -0%);
+            display: flex;
+            justify-content: middle;
+        }
+    </style>
+
 </head>
 
 <body>
-<div class="container">
-    <div sec:authorize="isAuthenticated()">
-  This content is only shown to authenticated users.
-</div>
-<div sec:authorize="!isAuthenticated()">
-  This content is only shown to unauthenticated users.
-</div>
+    <div th:replace="~{fragments/navbar :: navbar}">&nbsp;</div>
+    <div class="img-container">
+        <h1 class="title-text"><span th:text="${movie.title}"></span></h1>
+    </div>
+    <div>
+        <h3 class="overview-text"><span th:text="${movie.overview}"></span></h3>
+    </div>
 
-    <div>
-        <h1>List of Movies</h1>
+    <div class="sessions" >
+        <div th:replace="~{fragments/movie_sessions :: movie-sessions}">&nbsp;
+
+        </div>
     </div>
-     
-    <div>
-        <table class="table table-striped table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Title</th>
-                    <th>Overview</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="movie: ${listMovies}">
-                    <td th:text="${movie.title}">User ID</td>
-                    <td th:text="${movie.overview}">Overview</td>
-                    <td th:text="${movie.averageRating}">Rating</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+
+    <div th:replace="~{fragments/ticket_modal :: ticket-modal}">&nbsp;</div>
+
+
+<script type="text/javascript" src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="/js/jquery-3.7.1.min.js}" th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script type="text/javascript" src="/js/movies.js" th:src="@{/js/movies.js}"></script>
+
+
 </body>
+
 </html>

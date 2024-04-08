@@ -12,22 +12,15 @@ import com.erkiraak.movies.config.WebSecurityConfig;
 import com.erkiraak.movies.entity.User;
 import com.erkiraak.movies.repository.UserRepository;
 
-
 @Controller
 @Import(WebSecurityConfig.class)
-public class ApplicationController {
+public class SecurityController {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    
 
-    public ApplicationController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public SecurityController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @GetMapping("/")
-    public String getHomePage() {
-        return "index";
     }
 
     @GetMapping("/register")
@@ -44,28 +37,25 @@ public class ApplicationController {
 
             userRepository.save(user);
 
-        return "register_success";
+            return "register_success";
         } else {
             redirectAttributes.addFlashAttribute("error", "Email already exists");
             redirectAttributes.addFlashAttribute("user", user);
             return "redirect:/register";
 
         }
-        
-
     }
-    
+
     @GetMapping("/login")
     public String login() {
         return "login";
     }
-    
+
     @GetMapping("/login-error")
     public String loginError(Model model) {
         model.addAttribute("loginError", true);
         return "login";
     }
-    
 
     @GetMapping("/403")
     public String notAuthorized() {

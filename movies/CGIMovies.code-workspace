@@ -7,6 +7,10 @@
 	],
 	"settings": {
 		"java.configuration.updateBuildConfiguration": "automatic",
-		"java.debug.settings.onBuildFailureProceed": true
+		"java.debug.settings.onBuildFailureProceed": true,
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.debug.settings.showQualifiedNames": false,
+		"java.debug.settings.showHex": false,
+		"java.debug.settings.showStaticVariables": true
 	}
 }

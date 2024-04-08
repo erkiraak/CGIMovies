@@ -2,6 +2,7 @@ package com.erkiraak.movies.service;
 
 import java.util.List;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.erkiraak.movies.entity.Movie;
@@ -15,7 +16,7 @@ public class MovieService {
         this.repository = repository;
     }
 
-        public void saveMovie(Movie movie) {
+    public void saveMovie(@NonNull Movie movie) {
         repository.save(movie);
     }
 
@@ -23,7 +24,7 @@ public class MovieService {
         return repository.findAll();
     }
 
-    public Movie save(Movie movie) {
+    public Movie save(@NonNull Movie movie) {
         return repository.save(movie);
     }
 

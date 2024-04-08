@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Session fragment</title>
+
+</head>
+
+<body>
+    <div class="container" th:fragment="session" id="fragmentContainer">
+        <div th:fragment="session-table">
+
+
+            <div class="my-2 card overflow-hidden" th:each="sessionObject: ${sessionList}">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <a class="col-sm img-col p-0" th:href="@{/movies/{movieId}(movieId=${sessionObject.movie.id})}">
+                            <img class="card-img" th:if="${sessionObject.movie.posterURL != null}"
+                                th:src="${sessionObject.movie.posterURL}" alt="Movie Poster">
+                            <img th:unless="${sessionObject.movie.posterURL != null}"
+                                src="//movies/src/main/resources/static/img/poster.png" alt="Placeholder poster">
+                        </a>
+
+                        <div class="col-sm">
+                            <a class="row py-4 truncate-text w650"
+                                th:href="@{/movies/{movieId}(movieId=${sessionObject.movie.id})}">
+                                <h2 th:text="${sessionObject.movie.title}">Title</h2>
+                                <h5 th:if="${sessionObject.movie.titleOriginal != null}"
+                                    th:text="${sessionObject.movie.titleOriginal}">Original Title</h5>
+                            </a>
+
+                            <div class="row py-3">
+                                <div class="col-sm">
+                                    <h6>Screen <span th:text="${sessionObject.room.id}">Screen</span></h6>
+                                    <h3 th:text="${#temporals.format(sessionObject.time, 'HH:mm')}">Time</h3>
+                                </div>
+
+
+                                <div class="col-sm">
+                                    <div class="row">
+                                        <h6 class="truncate-text w200" th:if="${sessionObject.movie.genres != null}"
+                                            th:text="${sessionObject.movie.getGenresAsString()}">Genres</h6>
+                                    </div>
+
+                                    <div class="flex-row">
+                                        <span>Rating: </span>
+                                        <h3 class="px-1" th:text="${sessionObject.movie.averageRating}">Rating</h3>
+                                        <h6>(<span th:text="${sessionObject.movie.voteCount}">VoteCount</span>)</h6>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm">
+                                    <div class="row">
+                                        <div class="btn btn-primary buy-tickets-btn"
+                                            th:data-session-id="${sessionObject.getIntId()}" data-bs-toggle="modal"
+                                            data-bs-target="#ticket-modal">Buy tickets</div>
+                                    </div>
+                                    <div class="row">
+                                        <span>Seats available: </span>
+
+                                        <h6>
+                                            <span th:text="${sessionObject.getNumberOfAvailableSeats()}">Available
+                                                Seats</span>/<span th:text="${sessionObject.getNumberOfSeats()}">Number
+                                                of Seats</span>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm">
+                                    <a th:href="@{/movies/{movieId}(movieId=${sessionObject.movie.id})}"
+                                        class="btn btn-primary">More times</a>
+                                </div>
+
+                            </div>
+                            <div class="row">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>

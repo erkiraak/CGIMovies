@@ -11,36 +11,37 @@ import com.erkiraak.movies.entity.Movie;
 import com.erkiraak.movies.entity.Room;
 import com.erkiraak.movies.entity.Session;
 import com.erkiraak.movies.entity.Ticket;
+import com.erkiraak.movies.repository.RoomRepository;
 import com.erkiraak.movies.repository.TicketRepository;
-import com.erkiraak.movies.service.RoomService;
 import com.erkiraak.movies.service.SessionService;
 
 @Component
 public class SessionInitializer {
 
-    private RoomService roomService;
+    private RoomRepository roomRepository;
     private SessionService sessionService;
     private TicketRepository ticketRepository;
 
-    public SessionInitializer(RoomService roomService, SessionService sessionService,
+    public SessionInitializer(RoomRepository roomRepository, SessionService sessionService,
             TicketRepository ticketRepository) {
-        this.roomService = roomService;
+        this.roomRepository = roomRepository;
         this.sessionService = sessionService;
         this.ticketRepository = ticketRepository;
     }
 
-    public void generateSessions(List<Movie> movies, int numberOfDays, int percentOfReservedTickets) throws Exception {
+    @SuppressWarnings("null")
+    public void generateSessions(List<Movie> movies, int numberOfDays) throws Exception {
 
-        List<Room> rooms = roomService.getAllRooms();
+        List<Room> rooms = roomRepository.findAll();
         LocalDateTime sessiontime = LocalDateTime.now().minusDays(1);
         Random random = new Random();
 
-        // Create 5 movie sessions per room per day for two weeks starting with
-        // yesterday
+        // Create 5 movie sessions per room per day for n days, staggered by 10 minute
+        // intervals
         for (Room room : rooms) {
-            for (int i = 0; i < 14; i++) {
+            for (int i = 0; i < numberOfDays; i++) {
                 if (i == 0) {
-                    sessiontime = sessiontime.truncatedTo(ChronoUnit.DAYS).plusHours(12);
+                    sessiontime = sessiontime.truncatedTo(ChronoUnit.DAYS).plusHours(12).plusMinutes(room.getId() * 10);
                 } else {
                     sessiontime = sessiontime.plusMinutes(690);
                 }
@@ -49,24 +50,36 @@ public class SessionInitializer {
 
                     Movie movie = movies.get(random.nextInt(movies.size()));
 
-                    // Create a new session
-                    Session session = new Session(sessiontime, room, movie);
+                    // Create a new session and save it
+                    Session session = new Session();
+                    session.setRoom(room);
+                    session.setMovie(movie);
+                    session.setTime(sessiontime);
 
-                    // Reserve x% of seats for the session
+                    sessionService.saveSession(session);
+
+                    // Reserve a random percentage (between) of seats for the session
+
                     int numRows = room.getRows();
                     int numSeatsPerRow = room.getSeatsPerRow();
-                    int numSeatsToReserve = (int) (numRows * numSeatsPerRow * percentOfReservedTickets / 100);
+                    int numSeatsToReserve = (int) (numRows * numSeatsPerRow * random.nextInt(20, 75) / 100);
                     for (int k = 0; k < numSeatsToReserve; k++) {
                         int row = random.nextInt(numRows);
                         int seat = random.nextInt(numSeatsPerRow);
 
-                        Ticket ticket = new Ticket(session, row, seat);
+                        Ticket ticket = new Ticket();
+                        ticket.setSession(session);
+                        ticket.setRowNumber(row);
+                        ticket.setSeatNumber(seat);
+                        ticket.setCreatedAt(LocalDateTime.now());
+
                         session.setSeatReservation(row, seat);
                         session.addTicket(ticket);
                     }
 
-                    sessionService.saveSession(session);
                     ticketRepository.saveAll(session.getTicketList());
+
+                    sessionService.saveSession(session);
 
                     sessiontime = sessiontime.plusMinutes(150);
                 }

@@ -1,27 +1,35 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-    
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome to CGIMovies</title>
-    <script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Movies</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 
+
 <body>
-    <div sec:authorize="isAuthenticated()">
-        <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Logout"/>
-        </form>
+
+    <div th:replace="~{fragments/navbar :: navbar}">&nbsp;</div>
+
+    <div class="container-sm session-container">
+        <div th:replace="~{fragments/datepicker :: datepicker}">&nbsp;</div>
+
+        <div th:replace="~{fragments/session :: session}">&nbsp;</div>
     </div>
-    <div class="default-container">
-        <h1>Welcome to CGIMovies</h1>
-        <h3><a th:href="@{/movies}">List of Movies</a></h3>
-        <h3><a th:href="@{/register}">Register</a></h3>
-        <h3><a th:href="@{/login}">Login</a></h3>
-    </div>
-     
+
+    <div th:replace="~{fragments/ticket_modal :: ticket-modal}">&nbsp;</div>
+
+
+    <script type="text/javascript" src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="/js/jquery-3.7.1.min.js}" th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script type="text/javascript" src="/js/movies.js" th:src="@{/js/movies.js}"></script>
+    <script>
+        window.onload = generateButtons()
+    </script>
+
 </body>
+
 </html>

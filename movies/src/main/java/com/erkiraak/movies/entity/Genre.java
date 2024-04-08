@@ -7,28 +7,26 @@ import jakarta.persistence.Id;
 public class Genre {
 
     @Id
-    private int genreId;
+    private Integer id;
     private String name;
 
-    protected Genre() {
-    }
-    
-    public Genre(int genreId, String name) {
-        this.genreId = genreId;
-        this.name = name;
-    }
 
-    public int getGenreId() {
-        return genreId;
+    public Integer getId() {
+        return id;
     }
-    public void setGenreId(int genreId) {
-        this.genreId = genreId;
+    public void setId(Integer id) {
+        this.id = id;
     }
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     

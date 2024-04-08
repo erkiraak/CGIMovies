@@ -2,6 +2,8 @@ package com.erkiraak.movies.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +20,7 @@ public class Ticket {
     private Long ticketId;
 
     @ManyToOne
+    @JsonIgnore
     private Session session;
 
     @ManyToOne
@@ -30,24 +33,6 @@ public class Ticket {
 
     LocalDateTime createdAt;
 
-    
-    public Ticket(Session session, int rowNumber, int seatNumber) {
-        this.session = session;
-        this.rowNumber = rowNumber;
-        this.seatNumber = seatNumber;
-        session.addTicket(this);
-        this.createdAt = LocalDateTime.now();
-
-    }
-    
-    public Ticket(Session session, User user, int rowNumber, int seatNumber) {
-        this.session = session;
-        this.user = user;
-        this.rowNumber = rowNumber;
-        this.seatNumber = seatNumber;
-        session.addTicket(this);
-        this.createdAt = LocalDateTime.now();
-    }
     public Session getSession() {
         return session;
     }
@@ -71,6 +56,15 @@ public class Ticket {
     }
     public void setSeatNumber(int seatNumber) {
         this.seatNumber = seatNumber;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public Long getTicketId() {
+        return ticketId;
     }
 
     

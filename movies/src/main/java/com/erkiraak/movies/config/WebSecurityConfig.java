@@ -41,20 +41,21 @@ public class WebSecurityConfig {
 
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "register", "/process_register", "403",
-                                "/js/*.js", "/css/*.css")
+                        .requestMatchers("/**")
+                        // .requestMatchers("/movies/*", "register", "/process_register", "403",
+                        //         "/js/*.js", "/css/*.css", "/img/*", "/datesessions", 
+                        //         "fragments/session", "/sessions",
+                        //         "/sessions/*")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin((form) -> form
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/movies")
+                        .defaultSuccessUrl("/")
                         .permitAll())
                 .logout((logout) -> logout
                         .logoutSuccessUrl("/")
-                        .permitAll())
-                .exceptionHandling(handling -> handling
-                        .accessDeniedPage("/403.html"));
-
+                        .permitAll());
+                
         return http.build();
     }
 

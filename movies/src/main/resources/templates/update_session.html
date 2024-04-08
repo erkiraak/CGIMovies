@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update Session</title>
+</head>
+
+<body>
+
+    <div th:if="${success}">
+        <p>Success!</p>
+    </div>
+
+    <div th:if="${success}">
+        <p>No Success!</p>
+    </div>
+    <h2>Session Details</h2>
+    <table>
+        <tr>
+            <td>Session ID:</td>
+            <td th:text="${sessionObject.id}"></td>
+        </tr>
+        <tr>
+            <td>Time:</td>
+            <td th:text="${sessionObject.time}"></td>
+        </tr>
+        <tr>
+            <td>Room ID:</td>
+            <td th:text="${sessionObject.room.id}"></td>
+        </tr>
+        <tr>
+            <td>Movie ID:</td>
+            <td th:text="${sessionObject.movie.id}"></td>
+        </tr>
+        <tr>
+            <td>Seat Reservation JSON:</td>
+            <td th:text="${sessionObject.seatReservationJson}"></td>
+        </tr>
+        <tr>
+            <td>Array:</td>
+            <td th:text="${sessionObject.seatReservationArray}"></td>
+        </tr>
+    </table>
+
+    <h2>Update Session</h2>
+    <form th:action="@{/sessions/update}" th:object="${sessionObject}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{movie}" />
+        <input type="hidden" th:field="*{ticketList}" />
+        <input type="hidden" th:field="*{seatReservationJson}" />
+        <input type="hidden" th:field="*{seatReservationArray}" />
+
+        <label for="time">Time:</label>
+        <input type="text" th:field="*{time}" id="time" />
+        <br />
+
+        <label for="id">Room ID:</label>
+        <input type="text" th:field="*{room.id}" id="id" />
+        <br />
+
+
+        <button type="submit">Update</button>
+    </form>
+</body>
+
+</html>

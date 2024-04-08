@@ -1,47 +1,70 @@
 package com.erkiraak.movies.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.erkiraak.movies.entity.Session;
 import com.erkiraak.movies.repository.SessionRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class SessionService {
 
-    private SessionRepository SessionRepository;
-    private ObjectMapper objectMapper;
+    private SessionRepository sessionRepository;
 
     public SessionService(com.erkiraak.movies.repository.SessionRepository sessionRepository,
             ObjectMapper objectMapper) {
-        this.SessionRepository = sessionRepository;
-        this.objectMapper = objectMapper;
+        this.sessionRepository = sessionRepository;
     }
 
-    public void saveSession(Session Session) {
-        try {
-            String seatWeightsJson = objectMapper.writeValueAsString(Session.getseatReservationArray());
-            Session.setseatReservationJson(seatWeightsJson);
 
-            SessionRepository.save(Session);
-        } catch (Exception e) {
-            // Handle exception
+    public Session getSession(@NonNull Long id) {
+        Session session = sessionRepository.findById(id).orElse(null);
+        if (session != null) {
+            session.setSeatReservationArray();
         }
+        return session;
     }
 
-    public void getSession(Long SessionId) {
-        Session Session = SessionRepository.findById(SessionId).orElse(null);
-        if (Session != null) {
-            String seatReservationJson = Session.getseatReservationJson();
-            try {
-                boolean[][] seatWeights = objectMapper.readValue(seatReservationJson, new TypeReference<boolean[][]>() {
-                });
-                Session.setseatReservationArray(seatWeights);
+    public void saveSession(@NonNull Session session) {
+        sessionRepository.save(session);
+    }
 
-            } catch (Exception e) {
-                // Handle exception
-            }
+    public List<Session> getAllSessions() {
+        List<Session> sessions = sessionRepository.findAll();
+        for (Session session : sessions) {
+            session.setSeatReservationArray();
         }
+        return sessions;
     }
+
+    public List<Session> getSessionsForDate(LocalDate date) {
+
+        LocalDateTime startTime = LocalDateTime.of(date, LocalTime.of(0, 0));
+        LocalDateTime endTime = LocalDateTime.of(date, LocalTime.of(23, 59));
+        if (LocalDate.now().isEqual(date)) {
+            startTime = LocalDateTime.now();
+        }
+
+        List<Session> sessions = sessionRepository.findByTimeBetweenOrderByTimeAsc(startTime, endTime);
+        for (Session session : sessions) {
+            session.setSeatReservationArray();
+        }
+        return sessions;
+    }
+    
+    public List<Session> getSessionsByMovieId(int id) {
+        List<Session> sessions = sessionRepository.findByMovieId(id);
+        for (Session session : sessions) {
+            session.setSeatReservationArray();
+        }
+        return sessions;
+    }
+
+
 }
