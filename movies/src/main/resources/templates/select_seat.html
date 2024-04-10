@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seats</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+
+
+<body>
+    
+    <div th:replace="~{fragments/navbar :: navbar}">&nbsp;</div>
+    
+    <div th:replace="~{fragments/seatpicker :: seat-picker}">&nbsp;</div>
+    
+
+    <script type="text/javascript" src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="/js/jquery-3.7.1.min.js}" th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script type="text/javascript" src="/js/movies.js" th:src="@{/js/movies.js}"></script>
+    <script>
+        window.onload = generateButtons()
+    </script>
+
+</body>
+
+</html>

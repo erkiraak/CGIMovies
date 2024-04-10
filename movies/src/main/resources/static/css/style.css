@@ -103,8 +103,7 @@ a:active {
     /* font-size: 10vh;  */
     align-self: baseline;
     position: absolute;
-    top: 46window.onload = generateButtons()
-%;
+    top: 46;
     left: 50%;
     transform: translate(-50%, -0%);
     color: white;
@@ -132,7 +131,17 @@ a:active {
             left: 50%;
 
         }
+.seat {
+    height: 50;
+    width: 50;
+}
 
+.seat.occupied {
+    color: red;
+}
+.seat.available {
+    color: green;
+}
 /* 
 .btn-primary {
      --bs-btn-bg: #{$primary};

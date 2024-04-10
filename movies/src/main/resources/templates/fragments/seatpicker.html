@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seat picker fragment</title>
+
+</head>
+
+<body>
+    <div class="container" th:fragment="seat-picker" id="fragmentContainer">
+        <div th:fragment="seat-picker-table">
+
+
+            <div class="my-2 card overflow-hidden">
+                <div class="card-body p-0">
+                    <a th:text="${sessionObject.id}"></a>
+                    <div class="row" th:each="row : ${sessionObject.getSeatArray()}">
+
+                        <div class="col-sm">
+
+                        </div>
+
+                        <div class="col-sm" th:each="seat : ${row}">
+                            <a th:if="${seat.isReserved()}" class="seat occupied" th:text="${seat.getSeatColumn()}"></a>
+                            <a th:unless="${seat.isReserved()}" class="seat available"
+                                th:text="${seat.getSeatColumn()}"></a>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

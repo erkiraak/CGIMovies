@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.erkiraak.movies.entity.Movie;
 import com.erkiraak.movies.entity.Room;
+import com.erkiraak.movies.entity.Seat;
 import com.erkiraak.movies.entity.Session;
 import com.erkiraak.movies.entity.Ticket;
 import com.erkiraak.movies.repository.RoomRepository;
 import com.erkiraak.movies.repository.TicketRepository;
+import com.erkiraak.movies.service.SeatService;
 import com.erkiraak.movies.service.SessionService;
 
 @Component
@@ -21,29 +23,33 @@ public class SessionInitializer {
     private RoomRepository roomRepository;
     private SessionService sessionService;
     private TicketRepository ticketRepository;
+    private SeatService seatService;
 
     public SessionInitializer(RoomRepository roomRepository, SessionService sessionService,
-            TicketRepository ticketRepository) {
+            TicketRepository ticketRepository, SeatService seatService) {
         this.roomRepository = roomRepository;
         this.sessionService = sessionService;
         this.ticketRepository = ticketRepository;
+        this.seatService = seatService;
     }
 
     @SuppressWarnings("null")
     public void generateSessions(List<Movie> movies, int numberOfDays) throws Exception {
 
         List<Room> rooms = roomRepository.findAll();
-        LocalDateTime sessiontime = LocalDateTime.now().minusDays(1);
+        LocalDateTime startTime = LocalDateTime.now();
         Random random = new Random();
 
         // Create 5 movie sessions per room per day for n days, staggered by 10 minute
         // intervals
         for (Room room : rooms) {
+            LocalDateTime sessionTime = startTime;
             for (int i = 0; i < numberOfDays; i++) {
                 if (i == 0) {
-                    sessiontime = sessiontime.truncatedTo(ChronoUnit.DAYS).plusHours(12).plusMinutes(room.getId() * 10);
+                    sessionTime = sessionTime.truncatedTo(ChronoUnit.DAYS).plusDays(i).plusHours(12)
+                            .plusMinutes(room.getId() * 10);
                 } else {
-                    sessiontime = sessiontime.plusMinutes(690);
+                    sessionTime = sessionTime.plusMinutes(690);
                 }
 
                 for (int j = 0; j < 5; j++) {
@@ -54,36 +60,50 @@ public class SessionInitializer {
                     Session session = new Session();
                     session.setRoom(room);
                     session.setMovie(movie);
-                    session.setTime(sessiontime);
-
+                    session.setTime(sessionTime);
+                    session.setSeatsAvailable();
+                    
+                    
                     sessionService.saveSession(session);
-
+                    session.setSeats();
+                    seatService.saveAll(session.getSeats());
+                    
+                    // for (Seat seat : session.getSeats()) {
+                    // seatService.save(seat);
+                    // }
                     // Reserve a random percentage (between) of seats for the session
 
-                    int numRows = room.getRows();
-                    int numSeatsPerRow = room.getSeatsPerRow();
-                    int numSeatsToReserve = (int) (numRows * numSeatsPerRow * random.nextInt(20, 75) / 100);
+                    int rows = room.getRows();
+                    int columns = room.getColumns();
+                    int numSeatsToReserve = (int) (rows * columns * random.nextInt(20, 75) / 100);
                     for (int k = 0; k < numSeatsToReserve; k++) {
-                        int row = random.nextInt(numRows);
-                        int seat = random.nextInt(numSeatsPerRow);
+                        int row = random.nextInt(rows);
+                        int column = random.nextInt(columns);
 
                         Ticket ticket = new Ticket();
                         ticket.setSession(session);
-                        ticket.setRowNumber(row);
-                        ticket.setSeatNumber(seat);
+                        ticket.setSeat(session.getSeat(row, column));
                         ticket.setCreatedAt(LocalDateTime.now());
 
-                        session.setSeatReservation(row, seat);
-                        session.addTicket(ticket);
-                    }
+                        if (!session.getSeatReservation(row, column)) {
 
-                    ticketRepository.saveAll(session.getTicketList());
+                            try {
+                                seatService.setSeatReservation(session.getIntId(), row, column);
+                                session.addTicket(ticket);
+                                session.setSeatReservation();
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(e);
+                            }
+                        }
+                    }
+                    ticketRepository.saveAll(session.getTickets());
 
                     sessionService.saveSession(session);
 
-                    sessiontime = sessiontime.plusMinutes(150);
+                    sessionTime = sessionTime.plusMinutes(150);
                 }
             }
         }
     }
 }
+ 

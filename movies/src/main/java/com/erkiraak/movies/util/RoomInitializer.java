@@ -28,11 +28,10 @@ public class RoomInitializer {
             Room room = new Room();
             room.setId(i);
             room.setRows(rows);
-            room.setSeatsPerRow(seatsPerRow);
-            room.setBestSeatRow(bestSeatRow);
-            room.setBestSeatColumn(bestSeatColumn);
-            room.calculateSeatWeights();
-
+            room.setColumns(seatsPerRow);
+            room.setBestRow(bestSeatRow);
+            room.setBestColumn(bestSeatColumn);
+    
             roomRepository.save(room);
         }
     }

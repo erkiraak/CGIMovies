@@ -5,10 +5,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (event.target && event.target.classList.contains("buy-tickets-btn")) {
             var sessionId = event.target.dataset.sessionId;
-            
             var form = document.getElementById("ticket-form");
             form.action = "/sessions/" + sessionId;
-
+            
+            var availableTickets = event.target.dataset.tickets;
+            var input = document.getElementById("ticket-count");
+            input.setAttribute("max", availableTickets);
         }
     });
 });

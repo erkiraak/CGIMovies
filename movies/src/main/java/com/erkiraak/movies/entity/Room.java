@@ -1,12 +1,11 @@
 package com.erkiraak.movies.entity;
 
-import com.erkiraak.movies.util.JsonUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
 @Entity
 public class Room {
@@ -15,31 +14,9 @@ public class Room {
     private int id;
     @Column(name = "number_of_rows")
     private int rows;
-    private int seatsPerRow;
-    private int bestSeatRow;
-    private int bestSeatColumn;
-
-    @Column(columnDefinition = "TEXT")
-    private String seatWeightsJson;
-
-    @Transient
-    @Nullable
-    private int[][] seatWeightsArray;
-
-    public void calculateSeatWeights() {
-        // Assign weights based on the distance from the best seat and row
-        int[][] seatWeights = new int[this.rows][this.seatsPerRow];
-
-        for (int i = 0; i < this.rows; i++) {
-            for (int j = 0; j < this.seatsPerRow; j++) {
-                int rowDistance = Math.abs(this.bestSeatRow - i);
-                int columnDistance = Math.abs(this.bestSeatColumn - j);
-                seatWeights[i][j] = rowDistance + columnDistance;
-            }
-        }
-        this.seatWeightsArray = seatWeights;
-        setSeatWeightsJson();
-    }
+    private int columns;
+    private int bestRow;
+    private int bestColumn;
 
     public int getId() {
         return id;
@@ -57,50 +34,46 @@ public class Room {
         this.rows = rows;
     }
 
-    public int getSeatsPerRow() {
-        return seatsPerRow;
+    public int getColumns() {
+        return columns;
     }
 
-    public void setSeatsPerRow(int seatsPerRow) {
-        this.seatsPerRow = seatsPerRow;
+    public void setColumns(int seatsPerRow) {
+        this.columns = seatsPerRow;
     }
 
-    public int getBestSeatRow() {
-        return bestSeatRow;
+    public int getBestRow() {
+        return bestRow;
     }
 
-    public void setBestSeatRow(int bestSeatRow) {
-        this.bestSeatRow = bestSeatRow;
+    public void setBestRow(int bestSeatRow) {
+        this.bestRow = bestSeatRow;
     }
 
-    public int getBestSeatColumn() {
-        return bestSeatColumn;
+    public int getBestColumn() {
+        return bestColumn;
     }
 
-    public void setBestSeatColumn(int bestSeatColumn) {
-        this.bestSeatColumn = bestSeatColumn;
+    public void setBestColumn(int bestSeatColumn) {
+        this.bestColumn = bestSeatColumn;
     }
 
-    public String getSeatWeightsJson() {
-        return seatWeightsJson;
-    }
+    public List<Seat> getSeats() {
+        List<Seat> seats = new ArrayList<Seat>(this.rows * this.columns);
 
-    // save JSON after creating or updating array
-    private void setSeatWeightsJson() {
-        this.seatWeightsJson = JsonUtils.convertToJson(seatWeightsArray);
-        
-    }
-
-    public int[][] getSeatWeightsArray() {
-        if (seatWeightsArray == null) {
-            setSeatWeightsArray();
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.columns; j++) {
+                int seatWeight = Math.abs(this.bestRow - i) + Math.abs(this.bestColumn - j);
+                Seat seat = new Seat();
+                seat.setSeatRow(i);
+                seat.setSeatColumn(j);
+                seat.setSeatWeight(seatWeight);
+                seat.setReserved(false);
+                seats.add(seat);            
+            }
         }
-        return seatWeightsArray;
+        return seats;
     }
 
-    // generate array from JSON after deserialization
-    private void setSeatWeightsArray() {
-            this.seatWeightsArray = JsonUtils.convertFromJson(seatWeightsJson, int[][].class);
-    }
 
 }

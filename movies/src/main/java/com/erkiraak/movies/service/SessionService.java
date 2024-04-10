@@ -25,9 +25,6 @@ public class SessionService {
 
     public Session getSession(@NonNull Long id) {
         Session session = sessionRepository.findById(id).orElse(null);
-        if (session != null) {
-            session.setSeatReservationArray();
-        }
         return session;
     }
 
@@ -37,9 +34,6 @@ public class SessionService {
 
     public List<Session> getAllSessions() {
         List<Session> sessions = sessionRepository.findAll();
-        for (Session session : sessions) {
-            session.setSeatReservationArray();
-        }
         return sessions;
     }
 
@@ -52,19 +46,15 @@ public class SessionService {
         }
 
         List<Session> sessions = sessionRepository.findByTimeBetweenOrderByTimeAsc(startTime, endTime);
-        for (Session session : sessions) {
-            session.setSeatReservationArray();
-        }
         return sessions;
     }
     
     public List<Session> getSessionsByMovieId(int id) {
         List<Session> sessions = sessionRepository.findByMovieId(id);
-        for (Session session : sessions) {
-            session.setSeatReservationArray();
-        }
+
         return sessions;
     }
+    
 
 
 }

@@ -42,11 +42,11 @@ public class SessionController {
     }
    
     @GetMapping("/sessions/{id}")
-    public String getSessionById(@PathVariable long id, Model model) {
+    public String selectSeats(@PathVariable long id, Model model) {
         Session session = sessionService.getSession(id);
         model.addAttribute("sessionObject", session);
 
-        return "update_session";
+        return "select_seat";
     }
 
     @PostMapping("/sessions/update")

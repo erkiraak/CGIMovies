@@ -3,22 +3,20 @@ package com.erkiraak.movies.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import com.erkiraak.movies.util.JsonUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import io.micrometer.common.lang.Nullable;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
 
 @Entity
 public class Session {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,77 +30,65 @@ public class Session {
     private Movie movie;
 
     @OneToMany
-    private List<Ticket> ticketList = new ArrayList<Ticket>();
+    // @OneToMany(cascade = CascadeType.ALL)
+    private List<Ticket> tickets = new ArrayList<Ticket>();
+    
+    @OneToMany
+    // @OneToMany(cascade = CascadeType.ALL)
+    private List<Seat> seats;
 
-    @Column(columnDefinition = "TEXT")
-    private String seatReservationJson;
+    private int seatsAvailable;
 
-    @Nullable
-    @JsonIgnore
-    @Transient
-    private boolean[][] seatReservationArray;
-
-    public Session() {
+    
+    public void setSeatReservation() {
+        seatsAvailable--;
     }
 
-    public boolean setSeatReservation(int row, int seat) {
-        // TODO remove
-        if (seatReservationArray == null) {
-            setSeatReservationArray();
-        }
-        if (!seatReservationArray[row][seat]) {
-            seatReservationArray[row][seat] = true;
-            setSeatReservationJson();
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public boolean getSeatReservation(int row, int column) {
+        Seat seat = getSeat(row, column);
 
-    public boolean getSeatReservation(int row, int seat) {
-        // TODO remove
-        if (seatReservationArray == null) {
-            setSeatReservationArray();
+        return seat.isReserved();
         }
-        return seatReservationArray[row][seat];
-    }
+    
 
-    public int getNumberOfAvailableSeats() {
-        // TODO remove
-        if (seatReservationArray == null) {
-            setSeatReservationArray();
+    public List<Seat> getBestAvailableSeats(int n) {
+        if (n > seatsAvailable) {
+            throw new IllegalArgumentException("Not enough available seats");
         }
 
-        int count = 0;
-        for (int i = 0; i < room.getRows(); i++) {
-            for (int j = 0; j < room.getSeatsPerRow(); j++) {
-                if (!seatReservationArray[i][j]) {
-                    count++;
+        List<Seat> bestSeats = new ArrayList<>();
+        int bestSeatsWeight = Integer.MAX_VALUE;
+
+        for (int i = 0; i < room.getColumns(); i++) {
+            // get seats in row i
+            final int row = i;
+            List<Seat> availableSeatsInRow = seats.stream()
+                    .filter(seat -> seat.getSeatRow() == row && !seat.isReserved())
+                    .collect(Collectors.toList());
+
+            for (int j = 0; j <= availableSeatsInRow.size() - n; j++) {
+                // create a sublist with length n
+                List<Seat> availableSeats = availableSeatsInRow.subList(j, j + n);
+                // check if all seats are sequential
+                if (IntStream.range(0, availableSeats.size() - 1)
+                        .allMatch(k -> availableSeats.get(k + 1).isSequentialTo(seats.get(k)))) {
+
+                    int weight = availableSeats.stream().mapToInt(seat -> seat.getSeatWeight()).sum();
+                    if (weight < bestSeatsWeight) {
+                        bestSeatsWeight = weight;
+                        bestSeats = availableSeats;
+                    }
                 }
             }
         }
-        return count;
+        
+        
+        return bestSeats;
     }
 
-    public int getNumberOfSeats() {
-        return room.getRows() * room.getSeatsPerRow();
-    }
-
-    public void addTicket(Ticket ticket) {
-        this.ticketList.add(ticket);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public int getIntId() {
-        return Math.toIntExact(id);
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    
+    
+    
 
     public LocalDateTime getTime() {
         return time;
@@ -128,36 +114,88 @@ public class Session {
         this.movie = movie;
     }
 
-    public List<Ticket> getTicketList() {
-        return ticketList;
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
-    public void setTicketList(List<Ticket> ticketList) {
-        this.ticketList = ticketList;
+    public void setTickets(List<Ticket> ticketList) {
+        this.tickets = ticketList;
     }
 
-    public String getSeatReservationJson() {
-        return seatReservationJson;
+    public void addTicket(Ticket ticket) {
+        this.tickets.add(ticket);
     }
 
-    // save JSON after creating or updating array
-    // TODO create DTO
-    private void setSeatReservationJson() {
-        this.seatReservationJson = JsonUtils.convertToJson(seatReservationArray);
-    }
-
-    public boolean[][] getSeatReservationArray() {
-        return seatReservationArray;
-    }
-
-    // generate array or convert from JSON after deserialization
-    // TODO create DTO
-    public void setSeatReservationArray() {
-        if (seatReservationJson == null) {
-            this.seatReservationArray = new boolean[room.getRows()][room.getSeatsPerRow()];
-        } else {
-            this.seatReservationArray = JsonUtils.convertFromJson(seatReservationJson, boolean[][].class);
+    public void removeTicket(Ticket ticket) {
+        if (this.tickets.contains(ticket)) {
+            this.tickets.remove(ticket);
         }
+    }
+
+    public List<Seat> getSeats() {
+        return seats;
+    }
+
+    public Seat getSeat(int row, int column) {
+        Optional<Seat> seat = seats.stream()
+                .filter(s -> s.getSeatRow() == row && s.getSeatColumn() == column)
+                .findFirst();
+        if (seat.isPresent()) {
+            return seat.get();
+        } else {
+            throw new IllegalArgumentException("Seat not found");
+        }
+
+    }
+    
+    public Seat[][] getSeatArray() {
+        Seat[][] seatArray = new Seat[room.getRows()][room.getColumns()];
+        for (int i = 0; i < room.getRows(); i++) {
+            for (int j = 0; j < room.getColumns(); j++) {
+                seatArray[i][j] = getSeat(i, j);
+            }
+        }
+        return seatArray;
+    }
+
+    public void setSeats(List<Seat> seats) {
+        this.seats = seats;
+        for (Seat seat : seats) {
+            seat.setSession(this);
+        }
+    }
+
+    public void setSeats() {
+        this.seats = room.getSeats();
+        for (Seat seat : seats) {
+            seat.setSession(this);
+        }
+    }
+    public int getNumberOfSeats() {
+        return room.getRows() * room.getColumns();
+    }
+
+    public int getSeatsAvailable() {
+        return seatsAvailable;
+    }
+
+    public void setSeatsAvailable(int numberOfSeatsAvailable) {
+        this.seatsAvailable = numberOfSeatsAvailable;
+    }
+
+    public void setSeatsAvailable() {
+        this.seatsAvailable = room.getRows() * room.getColumns();
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public int getIntId() {
+        return Math.toIntExact(id);
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

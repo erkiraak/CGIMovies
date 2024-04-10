@@ -41,14 +41,14 @@
                                 <div class="col-sm">
                                     <div class="row">
                                         
-                                        <div class="btn btn-primary buy-tickets-btn" th:data-session-id="${sessionObject.getIntId()}" data-bs-toggle="modal"
+                                        <div class="btn btn-primary buy-tickets-btn" th:data-session-id="${sessionObject.getIntId()}" th:data-tickets="${sessionObject.getSeatsAvailable()}"  data-bs-toggle="modal"
                                             data-bs-target="#ticket-modal">Buy tickets</div>
                                     </div>
                                     <div class="row">
                                         <span>Seats available: </span>
 
                                         <h6>
-                                            <span th:text="${sessionObject.getNumberOfAvailableSeats()}">Available
+                                            <span th:text="${sessionObject.getSeatsAvailable()}">Available
                                                 Seats</span>/<span th:text="${sessionObject.getNumberOfSeats()}">Number
                                                 of Seats</span>
 
